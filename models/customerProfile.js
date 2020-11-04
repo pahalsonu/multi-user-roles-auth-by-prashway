@@ -17,6 +17,36 @@ const customerProfileSchema = new Schema({
     },
     phone: {
         type: String
+    },
+    
+   
+    isOpen: {
+        type: Boolean,
+        default: false
+    },
+    skills: {
+        type: Array, //[String]
+        required: true
+    },
+    bio: {
+        type: String
+    },
+    social: {
+        youtube: {
+            type: String
+        },
+        twitter: {
+            type: String
+        },
+        facebook: {
+            type: String
+        },
+        linkedin: {
+            type: String
+        },
+        instagram: {
+            type: String
+        }
     }
 
 });
