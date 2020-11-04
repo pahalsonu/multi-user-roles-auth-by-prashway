@@ -21,6 +21,9 @@ app.use('/api/admin', adminRoutes);
 const authROuter = require('./routes/auth')
 app.use('/api/auth', authROuter);
 
+//customer profile
+const customerProfile = require('./routes/customer/profile')
+app.use('/api/customer/profile', customerProfile);
 app.listen(port, ()=>{
 console.log(`Server is running at ${port}`)
 })
