@@ -52,8 +52,8 @@ router.post('/register', [
             customer = new Customer({ name, email, role, emailtoken, password })
             await customer.save();
             const verifyURL = `localhost:5000/api/customer/verify/${emailtoken}`;
-            const subject = 'New Product Email Verification';
-            const html = pug.renderFile(__dirname + '/email.pug');
+            const subject = 'New Product Email Verification,, `localhost:5000/api/customer/verify/${emailtoken}`';
+            const html = pug.renderFile(__dirname + '/email.pug',{name : name, verifyURL : verifyURL});
             Mailer(email, subject, html);
             //Prepare the Payload for access token 
             const payload = {
