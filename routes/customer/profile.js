@@ -106,8 +106,69 @@ router.get("/", authMiddleware, async (req, res) => {
         console.error(err);
         res.status(500).json({ "Error": "Server Error" });
     }
-})
+});
 
+/*
+Route : /api/customer/profile/all  GET
+Fetch All the Customer Profiles
+Public Route
+*/
+router.get('/all', async (req, res, next) => {
+    try {
+        const customerProfiles = await CustomerProfile.find().populate("customer", "name email -_id");
+        res.status(200).json({ customerProfiles });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ "Error": "Server Error" });
+    }
+});
+
+/*
+Route : /api/customer/profile/experience  PUT
+Fetch All the Customer Profiles
+Private  Route
+*/
+router.put("/experience", [authMiddleware, [
+    body("title", "Title is Required").notEmpty(),
+    body("company", "Company is Required").notEmpty(),
+    body("from", "From Date is Required").notEmpty()
+]], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        const { title,
+            company,
+            location,
+            from,
+            to,
+            current,
+            description
+        } = req.body;
+
+        //Build Experience Object 
+        const newExp = {
+            title,
+            company,
+            location,
+            from,
+            to,
+            current,
+            description
+        }
+        const customerProfile = await CustomerProfile.findOne({ customer: req.customer.customer });
+        customerProfile.experience.unshift(newExp);
+        await customerProfile.save();
+        res.status(200).json({ customerProfile });
+
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ "Error": "Server Error" });
+    }
+})
 
 
 module.exports = router;
