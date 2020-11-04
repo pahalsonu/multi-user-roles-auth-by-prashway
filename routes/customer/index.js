@@ -34,7 +34,7 @@ router.post('/register', [
             return res.status(400).json({ errors: errors.array() });
         }
         try {
-            let { name, email, role} = req.body;
+            let { name, email, role } = req.body;
             let customer = await Customer.findOne({ email });
             let admin = await Admin.findOne({ email });
             if (customer) {
@@ -48,12 +48,12 @@ router.post('/register', [
             const salt = await bcrypt.genSalt(saltRounds);
             let password = await bcrypt.hash(req.body.password, salt);
             const emailtoken = randomstring.generate();
-
+            console.log(emailtoken)
             customer = new Customer({ name, email, role, emailtoken, password })
             await customer.save();
             const verifyURL = `localhost:5000/api/customer/verify/${emailtoken}`;
             const subject = 'New Product Email Verification,, `localhost:5000/api/customer/verify/${emailtoken}`';
-            const html = pug.renderFile(__dirname + '/email.pug',{name : name, verifyURL : verifyURL});
+            const html = pug.renderFile(__dirname + '/email.pug', { name: name, verifyURL: verifyURL });
             Mailer(email, subject, html);
             //Prepare the Payload for access token 
             const payload = {
@@ -74,7 +74,24 @@ router.post('/register', [
             console.error(err);
             res.status(500).json({ 'Error': 'Servor Error' })
         }
-    })
+    });
+
+/*
+Route : /api/customer/verify/:emailtoken
+for email verification
+*/  
+router.get('/verify/:emailtoken', async (req, res, next) => {
+    console.log('yes')
+    try {
+        const emailtoken = req.params.emailtoken;
+        const data = await Customer.findOneAndUpdate({ emailtoken }, { $set: { active: true } });
+        res.send(`<h1> ${data.email} is successfully verified. </h1>`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ "Error": "Server Error" });
+    }
+});
+
 
 
 module.exports = router;
